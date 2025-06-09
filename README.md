@@ -184,7 +184,7 @@ A: 确保OpenRouter Api Key是否正确配置，前往官网检查ApiKey是否�
 1. **Android开发基础** - 从零开始学习Activity、Fragment、Adapter等组件
 2. **架构设计** - 理解MVVM模式的优势和实现方法
 3. **网络编程** - 学会使用OkHttp进行API调用和错误处理
-4. **数据库操作** - 掌握Room数据库的使用方法
+4. **数据库操作** - 掌握Room数据库（SQLite）的使用方法
 5. **UI设计** - 学习Material Design设计原则和实现
 6. **异步编程** - 使用Kotlin协程处理后台任务
 7. **项目管理** - 使用Git进行版本控制和代码管理
@@ -196,10 +196,10 @@ A: 确保OpenRouter Api Key是否正确配置，前往官网检查ApiKey是否�
 
 ## 🔒 隐私说明
 
-- 应用仅在本地存储天气数据
 - 位置权限仅用于获取当前位置天气
 - 不收集任何个人信息
 - 所有数据来源于公开的天气API
+- AI回复内容来源于OpenRouter提供的DeepSeek R1大模型
 
 ## 🤝 贡献
 
