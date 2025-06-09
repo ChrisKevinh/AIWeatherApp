@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- 网络权限 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- 位置权限 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <application
+        android:name=".WeatherApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.WeatherDemo"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.WeatherDemo"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <!-- 城市详情Activity -->
+        <activity
+            android:name=".CityDetailActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        
+        <!-- AI天气助手Activity -->
+        <activity
+            android:name=".AIWeatherAssistantActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
+        
+        <!-- 设置Activity -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
+        
+        <!-- 天气小部件 -->
+        <receiver
+            android:name=".widget.WeatherWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.example.weatherdemo.widget.UPDATE" />
+                <action android:name="com.example.weatherdemo.widget.CLICK" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/weather_widget_info" />
+        </receiver>
+        
+        <!-- 小部件后台更新服务 -->
+        <service
+            android:name=".widget.WeatherWidgetUpdateService"
+            android:exported="false" />
+        
+    </application>
+
+</manifest>

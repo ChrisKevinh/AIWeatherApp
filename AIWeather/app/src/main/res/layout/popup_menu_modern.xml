@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    app:cardCornerRadius="28dp"
+    app:cardElevation="16dp"
+    app:cardBackgroundColor="@color/modern_menu_background">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:minWidth="140dp"
+        android:background="@drawable/menu_gradient_background">
+
+        <!-- 编辑列表选项 -->
+        <LinearLayout
+            android:id="@+id/editModeOption"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="10dp"
+            android:background="@drawable/menu_item_ripple"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_edit"
+                app:tint="@color/menu_icon_color"
+                android:layout_marginEnd="10dp" />
+
+            <TextView
+                android:id="@+id/editModeText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="编辑列表"
+                android:textColor="@color/menu_text_color"
+                android:textSize="15sp"
+                android:textStyle="normal" />
+
+        </LinearLayout>
+
+        <!-- 分割线 -->
+        <View
+            android:id="@+id/menuDivider1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginVertical="4dp"
+            android:background="@color/menu_divider_color"
+            android:alpha="0.4" />
+
+        <!-- 设置选项 -->
+        <LinearLayout
+            android:id="@+id/settingsOption"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="10dp"
+            android:background="@drawable/menu_item_ripple"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_settings"
+                app:tint="@color/menu_icon_color"
+                android:layout_marginEnd="10dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="单位设置"
+                android:textColor="@color/menu_text_color"
+                android:textSize="15sp"
+                android:textStyle="normal" />
+
+        </LinearLayout>
+
+        <!-- 分割线 -->
+        <View
+            android:id="@+id/menuDivider2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginVertical="4dp"
+            android:background="@color/menu_divider_color"
+            android:alpha="0.4" />
+
+        <!-- 关于选项 -->
+        <LinearLayout
+            android:id="@+id/aboutOption"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="10dp"
+            android:background="@drawable/menu_item_ripple"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_info"
+                app:tint="@color/menu_icon_color"
+                android:layout_marginEnd="10dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="关于"
+                android:textColor="@color/menu_text_color"
+                android:textSize="15sp"
+                android:textStyle="normal" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView> 

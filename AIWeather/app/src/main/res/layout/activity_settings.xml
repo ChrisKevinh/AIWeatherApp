@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/black"
+    android:fitsSystemWindows="true">
+
+    <!-- 顶部导航栏 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:paddingHorizontal="20dp"
+        android:gravity="center_vertical">
+
+        <!-- 返回按钮 -->
+        <ImageView
+            android:id="@+id/backButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_arrow_back"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            app:tint="@color/white"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- 标题 -->
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="设置"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <!-- 主要内容区域 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="8dp"
+        android:scrollbars="none"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="32dp">
+
+            <!-- 温度单位卡片 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/modern_card_background"
+                android:padding="24dp"
+                android:layout_marginTop="16dp">
+
+                <!-- 卡片标题 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="温度单位"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- 副标题 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="选择温度显示单位"
+                    android:textColor="@color/white_60"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- 温度单位选项 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- 摄氏度选项 -->
+                    <LinearLayout
+                        android:id="@+id/celsiusOption"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/settings_option_background"
+                        android:paddingHorizontal="20dp"
+                        android:layout_marginBottom="12dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <RadioButton
+                            android:id="@+id/celsiusRadio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/primary_blue"
+                            android:clickable="false"
+                            android:focusable="false" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="摄氏度"
+                                android:textColor="@color/white"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="25°C"
+                                android:textColor="@color/white_60"
+                                android:textSize="13sp"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <!-- 单位符号 -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="°C"
+                            android:textColor="@color/primary_blue"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <!-- 华氏度选项 -->
+                    <LinearLayout
+                        android:id="@+id/fahrenheitOption"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/settings_option_background"
+                        android:paddingHorizontal="20dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <RadioButton
+                            android:id="@+id/fahrenheitRadio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/primary_blue"
+                            android:clickable="false"
+                            android:focusable="false" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="华氏度"
+                                android:textColor="@color/white"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="77°F"
+                                android:textColor="@color/white_60"
+                                android:textSize="13sp"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <!-- 单位符号 -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="°F"
+                            android:textColor="@color/white_60"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- 换算规则卡片 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/info_card_background"
+                android:padding="20dp"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="换算规则"
+                    android:textColor="@color/white_80"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="°F = °C × 9/5 + 32\n°C = (°F - 32) × 5/9\n\n水的冰点：0°C = 32°F\n水的沸点：100°C = 212°F"
+                    android:textColor="@color/white_60"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="2dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout> 

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/search_item_background"
+    android:clickable="true"
+    android:focusable="true">
+
+    <TextView
+        android:id="@+id/cityNameText"
+        style="@style/SearchResultCityText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="北京"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif"
+        android:letterSpacing="0.01"
+        android:textIsSelectable="false"
+        android:ellipsize="end"
+        android:maxLines="1" />
+
+    <TextView
+        android:id="@+id/regionText"
+        style="@style/SearchResultRegionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="北京, 中国"
+        android:textColor="@color/white_80"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:letterSpacing="0.01"
+        android:textIsSelectable="false"
+        android:ellipsize="end"
+        android:maxLines="2" />
+
+</LinearLayout> 

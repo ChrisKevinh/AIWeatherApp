@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_background"
+    android:padding="24dp">
+
+    <!-- 标题 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="选择分析城市"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp" />
+
+    <!-- 搜索输入框 -->
+    <EditText
+        android:id="@+id/searchEditText"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/search_background"
+        android:hint="搜索城市..."
+        android:textColorHint="@color/white_60"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:paddingHorizontal="16dp"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="12dp"
+        app:drawableTint="@color/white_60"
+        android:layout_marginBottom="12dp" />
+
+    <!-- 列表标题 -->
+    <TextView
+        android:id="@+id/listTitleText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="已保存的城市"
+        android:textColor="@color/white_80"
+        android:textSize="14sp"
+        android:paddingHorizontal="4dp"
+        android:paddingVertical="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
+    <!-- 搜索结果列表 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/searchResultsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="300dp"
+        android:visibility="gone" />
+
+    <!-- 空状态提示 -->
+    <TextView
+        android:id="@+id/emptyStateText"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:text="输入城市名称进行搜索"
+        android:textColor="@color/white_60"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:alpha="0.8" />
+
+    <!-- 按钮区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:id="@+id/cancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="取消"
+            android:textColor="@color/white_80"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:layout_marginEnd="12dp" />
+
+    </LinearLayout>
+
+</LinearLayout> 

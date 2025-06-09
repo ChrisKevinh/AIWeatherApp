@@ -1,0 +1,41 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  
+  <!-- 机器人头部轮廓 - 更宽更大 -->
+  <path
+      android:strokeColor="#FFFFFF"
+      android:strokeWidth="2"
+      android:fillType="evenOdd"
+      android:pathData="M4,7C4,5.343 5.343,4 7,4L17,4C18.657,4 20,5.343 20,7L20,17C20,18.657 18.657,20 17,20L7,20C5.343,20 4,18.657 4,17L4,7Z"/>
+  
+  <!-- 机器人眼睛 - 更大更明显 -->
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M8.5,10m-1.5,0a1.5,1.5 0,1,1 3,0a1.5,1.5 0,1,1 -3,0"/>
+  
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M15.5,10m-1.5,0a1.5,1.5 0,1,1 3,0a1.5,1.5 0,1,1 -3,0"/>
+  
+  <!-- 机器人嘴部 - 更长 -->
+  <path
+      android:strokeColor="#FFFFFF"
+      android:strokeWidth="2"
+      android:strokeLineCap="round"
+      android:pathData="M9,15L15,15"/>
+  
+  <!-- 机器人天线 -->
+  <path
+      android:strokeColor="#FFFFFF"
+      android:strokeWidth="2"
+      android:strokeLineCap="round"
+      android:pathData="M12,4L12,2"/>
+  
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M12,1.5m-1,0a1,1 0,1,1 2,0a1,1 0,1,1 -2,0"/>
+  
+</vector> 

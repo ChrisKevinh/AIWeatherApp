@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_weather"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- 顶部：城市名称和更新时间 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="4dp">
+
+        <TextView
+            android:id="@+id/widget_city_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="定位中..."
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/widget_update_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="--:--"
+            android:textColor="#C0FFFFFF"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- 主体：温度、天气图标和详细信息 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- 左侧：温度和天气描述 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <!-- 温度 -->
+            <TextView
+                android:id="@+id/widget_temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--°"
+                android:textColor="@android:color/white"
+                android:textSize="44sp"
+                android:textStyle="bold" />
+
+            <!-- 天气描述 -->
+            <TextView
+                android:id="@+id/widget_weather_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取天气中..."
+                android:textColor="#F0FFFFFF"
+                android:textSize="15sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginTop="-2dp" />
+
+        </LinearLayout>
+
+        <!-- 中间：天气图标 -->
+        <ImageView
+            android:id="@+id/widget_weather_icon"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_weather_loading"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:contentDescription="天气图标" />
+
+        <!-- 右侧：详细信息 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end">
+
+            <!-- 温度范围 -->
+            <TextView
+                android:id="@+id/widget_temp_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="最高--° 最低--°"
+                android:textColor="#E0FFFFFF"
+                android:textSize="14sp"
+                android:layout_marginBottom="2dp" />
+
+            <!-- 湿度 -->
+            <TextView
+                android:id="@+id/widget_humidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="湿度 --%"
+                android:textColor="#E0FFFFFF"
+                android:textSize="14sp"
+                android:layout_marginBottom="2dp" />
+
+            <!-- 体感温度 -->
+            <TextView
+                android:id="@+id/widget_feels_like"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="体感 --°"
+                android:textColor="#D0FFFFFF"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout> 

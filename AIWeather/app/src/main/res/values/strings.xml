@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">WeatherDemo</string>
+    <!-- 小部件相关 -->
+    <string name="weather_widget_description">显示当前位置的天气信息</string>
+    <string name="widget_loading">正在加载天气数据...</string>
+    <string name="widget_error">天气数据获取失败</string>
+    <string name="widget_no_data">暂无天气数据</string>
+</resources>

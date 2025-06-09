@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="320dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    app:cardCornerRadius="28dp"
+    app:cardElevation="24dp"
+    app:cardBackgroundColor="@color/modern_dialog_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:background="@drawable/modern_dialog_gradient">
+
+        <!-- 图标区域 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="24dp">
+
+            <View
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/delete_icon_background" />
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="-46dp"
+                android:src="@drawable/ic_delete_red"
+                app:tint="@color/white" />
+
+        </LinearLayout>
+
+        <!-- 标题 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="删除城市"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 内容 -->
+        <TextView
+            android:id="@+id/messageText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="确定要删除的天气信息吗？"
+            android:textColor="@color/white_80"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- 警告提示 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="此操作无法撤销"
+            android:textColor="@color/white_60"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginBottom="32dp" />
+
+        <!-- 按钮区域 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!-- 取消按钮 -->
+            <TextView
+                android:id="@+id/cancelButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="取消"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:background="@drawable/modern_dialog_button_cancel"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- 删除按钮 -->
+            <TextView
+                android:id="@+id/deleteButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="删除"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:background="@drawable/modern_dialog_button_delete"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView> 

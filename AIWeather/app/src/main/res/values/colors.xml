@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="white_80">#CCFFFFFF</color>
+    <color name="white_60">#99FFFFFF</color>
+    <color name="white_40">#66FFFFFF</color>
+    <color name="white_30">#4DFFFFFF</color>
+    <color name="white_20">#33FFFFFF</color>
+    
+    <!-- 主色调 -->
+    <color name="primary_blue">#007AFF</color>
+    <color name="secondary_blue">#5AC8FA</color>
+    <color name="dark_blue">#0A84FF</color>
+    
+    <!-- 背景颜色 -->
+    <color name="gradient_start">#4A90E2</color>
+    <color name="gradient_end">#7B68EE</color>
+    <color name="card_background">#33FFFFFF</color>
+    <color name="fab_background">#66FFFFFF</color>
+    
+    <!-- 新增：城市列表界面颜色 -->
+    <color name="search_background">#1C1C1E</color>
+    <color name="city_card_background">#1AFFFFFF</color>
+    <color name="city_card_background_night">#1A1A1A</color>
+    <color name="text_primary_dark">#FFFFFF</color>
+    <color name="text_secondary_dark">#EBEBF5</color>
+    <color name="text_tertiary_dark">#EBEBF5</color>
+    
+    <!-- 系统颜色 -->
+    <color name="status_bar_color">#20000000</color>
+    <color name="navigation_bar_color">#20000000</color>
+    
+    <!-- 文字颜色 -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#CCFFFFFF</color>
+    <color name="text_tertiary">#99FFFFFF</color>
+    
+    <!-- 错误和警告颜色 -->
+    <color name="error_red">#FF453A</color>
+    <color name="warning_orange">#FF9F0A</color>
+    <color name="success_green">#30D158</color>
+    
+    <!-- 新增：编辑模式背景色 -->
+    <color name="edit_mode_background">#0A0A0A</color>
+    <color name="edit_mode_card">#1C1C1E</color>
+    <color name="edit_mode_accent">#FF453A</color>
+    
+    <!-- 新增：AI页面需要的新颜色资源 -->
+    <color name="transparent">#00000000</color>
+    <color name="white_90">#E6FFFFFF</color>
+    <color name="white_15">#26FFFFFF</color>
+    <color name="white_10">#1AFFFFFF</color>
+    <color name="white_5">#0DFFFFFF</color>
+    <color name="white_05">#0DFFFFFF</color>
+    
+    <!-- 删除按钮 -->
+    <color name="delete_button_red">#EEFF1744</color>
+    <color name="delete_button_red_pressed">#FFFF1744</color>
+    <color name="delete_button_color">#FF5252</color>
+    <color name="success_color">#4CAF50</color>
+    
+    <!-- 现代化菜单颜色 -->
+    <color name="modern_menu_background">#E61C1C1E</color>
+    <color name="menu_text_color">#FFFFFF</color>
+    <color name="menu_icon_color">#CCFFFFFF</color>
+    <color name="menu_divider_color">#33FFFFFF</color>
+    <color name="menu_ripple_color">#33FFFFFF</color>
+    
+    <!-- 现代化对话框颜色 -->
+    <color name="modern_dialog_background">#E62C3A47</color>
+    <color name="about_dialog_background">#CC000000</color>
+</resources>

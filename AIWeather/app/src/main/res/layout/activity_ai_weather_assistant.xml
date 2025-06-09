@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/black"
+    tools:context=".AIWeatherAssistantActivity">
+
+    <!-- 顶部工具栏 -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="48dp"
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="@color/white"
+        android:paddingHorizontal="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="AI 天气助手"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingBottom="20dp">
+
+                <!-- AI分析标题区 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_ai_assistant"
+                        app:tint="@color/white"
+                        android:layout_marginEnd="12dp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="基于当前天气的智能分析"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:alpha="0.9" />
+
+                </LinearLayout>
+
+                <!-- 城市选择卡片 -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/white_10">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="20dp"
+                        android:gravity="center_vertical">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="分析城市"
+                                android:textColor="@color/white_80"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/selectedCityText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="定位中..."
+                                android:textColor="@color/white"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:layout_marginTop="4dp" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/changeCityButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="选择城市"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            android:background="@drawable/button_rounded_white_15"
+                            android:padding="12dp"
+                            android:drawableStart="@drawable/ic_location"
+                            android:drawablePadding="8dp"
+                            app:drawableTint="@color/white" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- 加载状态提示 -->
+                <LinearLayout
+                    android:id="@+id/loadingLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:padding="40dp"
+                    android:visibility="visible">
+
+                    <ProgressBar
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="12dp"
+                        android:indeterminateTint="@color/white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AI 正在分析天气数据..."
+                        android:textColor="@color/white_80"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <!-- 错误状态提示 -->
+                <LinearLayout
+                    android:id="@+id/errorLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="40dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_error"
+                        app:tint="@color/white_60"
+                        android:layout_marginBottom="16dp" />
+
+                    <TextView
+                        android:id="@+id/errorMessageText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="获取AI分析失败"
+                        android:textColor="@color/white_80"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="16dp" />
+
+                    <TextView
+                        android:id="@+id/retryButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="点击重试"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:background="@drawable/button_rounded_white_15"
+                        android:padding="12dp"
+                        android:layout_marginTop="8dp" />
+
+                </LinearLayout>
+
+                <!-- AI 回答内容卡片 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/aiResponseCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/white_15"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="24dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="20dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_ai_assistant"
+                                app:tint="@color/white"
+                                android:layout_marginEnd="12dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="AI 智能分析"
+                                android:textColor="@color/white"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/aiResponseText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textColor="@color/white_90"
+                            android:textSize="16sp"
+                            android:lineSpacingExtra="6dp"
+                            android:alpha="0.95" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- 底部AI标识 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="20dp"
+                    android:alpha="0.7">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_ai_assistant"
+                        app:tint="@color/white"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="由 DeepSeek R1 提供智能分析"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+</LinearLayout> 

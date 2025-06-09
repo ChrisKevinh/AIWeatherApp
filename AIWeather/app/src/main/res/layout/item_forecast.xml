@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:gravity="center_vertical">
+
+    <!-- 日期信息 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/dayText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="今天"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/dateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12-25"
+            android:textColor="@color/white_60"
+            android:textSize="13sp"
+            android:layout_marginTop="2dp" />
+
+    </LinearLayout>
+
+    <!-- 天气状况 -->
+    <TextView
+        android:id="@+id/weatherText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:text="多云"
+        android:textColor="@color/white_80"
+        android:textSize="15sp"
+        android:gravity="center" />
+
+    <!-- 温度范围 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.5"
+        android:orientation="horizontal"
+        android:gravity="end|center_vertical">
+
+        <TextView
+            android:id="@+id/tempLowText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="18°"
+            android:textColor="@color/white_60"
+            android:textSize="16sp"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/tempHighText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="25°"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout> 

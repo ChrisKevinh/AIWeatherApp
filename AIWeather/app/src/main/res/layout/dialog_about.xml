@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="32dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="16dp"
+    app:cardBackgroundColor="@color/about_dialog_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="32dp">
+
+        <!-- 应用图标和标题 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="24dp">
+
+            <!-- 应用图标 -->
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:src="@mipmap/ic_launcher"
+                android:layout_marginBottom="16dp" />
+
+            <!-- 应用名称 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="天气应用"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <!-- 版本信息 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="版本 1.0.0"
+                android:textColor="@color/white_80"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <!-- 分割线 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/white_20"
+            android:layout_marginVertical="20dp" />
+
+        <!-- 应用介绍 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="简约而精致的天气应用，为您提供准确的天气信息和贴心的生活建议。"
+                android:textColor="@color/white_80"
+                android:textSize="16sp"
+                android:lineSpacingExtra="4dp"
+                android:gravity="center"
+                android:layout_marginBottom="16dp" />
+
+            <!-- 功能特色 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- 实时天气 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🌤️"
+                        android:textSize="18sp"
+                        android:layout_marginEnd="12dp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="实时天气信息与24小时预报"
+                        android:textColor="@color/white_60"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- AI助手 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🤖"
+                        android:textSize="18sp"
+                        android:layout_marginEnd="12dp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="智能AI天气分析与生活建议"
+                        android:textColor="@color/white_60"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- 数据可视化 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📊"
+                        android:textSize="18sp"
+                        android:layout_marginEnd="12dp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="数据图表与趋势分析"
+                        android:textColor="@color/white_60"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- 分割线 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/white_20"
+            android:layout_marginVertical="20dp" />
+
+        <!-- 技术信息 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="技术信息"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="• 天气数据来源：Weather API\n• 开发框架：Android Kotlin\n• AI 服务：OpenRouter API"
+                android:textColor="@color/white_60"
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp" />
+
+        </LinearLayout>
+
+        <!-- 确定按钮 -->
+        <Button
+            android:id="@+id/confirmButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="确定"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:background="@drawable/button_rounded_white_15"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView> 
+ 

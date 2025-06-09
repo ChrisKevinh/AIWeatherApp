@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/black"
+    android:fitsSystemWindows="true"
+    tools:context=".MainActivity">
+
+    <!-- 状态栏占位 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0" />
+
+    <!-- 顶部标题栏 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="16dp">
+
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="天气"
+            android:textColor="@color/white"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/aiButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_toStartOf="@id/menuButton"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/ic_ai_assistant"
+            app:tint="@color/white"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="6dp"
+            android:contentDescription="AI天气助手" />
+
+        <ImageView
+            android:id="@+id/menuButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_menu"
+            app:tint="@color/white"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="6dp" />
+
+    </RelativeLayout>
+
+    <!-- 搜索栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
+        android:background="@drawable/search_background"
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="16dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_search"
+            app:tint="@android:color/darker_gray"
+            android:layout_marginEnd="12dp" />
+
+        <EditText
+            android:id="@+id/searchEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:hint="搜索城市或机场"
+            android:textColor="@color/white"
+            android:textColorHint="@android:color/darker_gray"
+            android:textSize="16sp"
+            android:inputType="text"
+            android:imeOptions="actionSearch" />
+
+        <ImageView
+            android:id="@+id/micButton"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_mic"
+            app:tint="@android:color/darker_gray"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="2dp" />
+
+    </LinearLayout>
+
+    <!-- 搜索结果区域 -->
+    <FrameLayout
+        android:id="@+id/searchResultsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/searchResultsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="16dp" />
+
+    </FrameLayout>
+
+    <!-- 城市列表 -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/cityListRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="16dp" />
+            
+            <!-- 空状态提示 -->
+            <TextView
+                android:id="@+id/emptyStateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="搜索并添加城市\n查看天气信息"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:visibility="visible" />
+                
+        </FrameLayout>
+        
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- 底部提示文字 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="天气数据来源: Weather API"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:padding="16dp" />
+
+</LinearLayout> 
