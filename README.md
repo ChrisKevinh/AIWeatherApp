@@ -47,7 +47,7 @@
 
 ### 核心技术
 - **MVVM架构** - 使用ViewModel和LiveData
-- **Room数据库** - 本地数据存储
+- **SQLite数据库（Room框架）** - 本地数据存储
 - **OkHttp + Gson** - 网络请求和JSON解析
 - **Kotlin协程** - 异步操作处理
 - **ViewBinding** - 视图绑定
