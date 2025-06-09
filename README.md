@@ -89,8 +89,7 @@ implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
 1. **克隆项目**
    ```bash
-   git clone https://github.com/ChrisKevinh/AIWeatherApp
-   cd AIWeather
+   git clone https://github.com/ChrisKevinh/AIWeatherApp.git
    ```
 
 2. **配置API密钥** (必须)
