@@ -115,9 +115,16 @@ implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
 3. **可选：配置AI功能**
    
-   如果要使用AI助手功能：
-   - 访问 [OpenRouter.ai](https://openrouter.ai/) 获取API密钥
-   - 在 `OpenRouterApiService.kt` 中配置密钥
+   ⚠️ **重要警示！！** ⚠️
+   
+   **如果您是通过clone获取的此项目，AI功能大概率无法直接使用！**
+   
+   原因：项目中的OpenRouter API密钥因为在GitHub上暴露，已被系统自动撤销失效。
+   
+   **要使用AI助手功能，您必须：**
+   - 访问 [OpenRouter.ai](https://openrouter.ai/) 自行注册并获取新的API密钥
+   - 在 `OpenRouterApiService.kt` 中替换为您自己的API密钥
+   - ⚠️ **切记不要将您的API密钥提交到公共仓库！**
 
 
 ## 📱 使用说明
