@@ -34,6 +34,10 @@ import android.widget.Button
 import com.example.weatherdemo.widget.WeatherWidgetProvider
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.weatherdemo.utils.SettingsManager
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.speech.RecognitionListener
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     
@@ -43,6 +47,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchResultAdapter: SearchResultAdapter
     private lateinit var locationManager: com.example.weatherdemo.LocationManager
     private lateinit var settingsManager: SettingsManager
+    
+    // 语音识别相关
+    private var speechRecognizer: SpeechRecognizer? = null
+    private var isListening = false
     
     // Settings Activity启动器
     private val settingsLauncher = registerForActivityResult(
@@ -54,8 +62,34 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
+    // Intent方式语音识别启动器
+    private val voiceRecognitionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val matches = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            if (!matches.isNullOrEmpty()) {
+                val recognizedText = matches[0]
+                Log.d("VoiceRecognition", "Intent recognition result: $recognizedText")
+                
+                // 将识别结果填入搜索框并执行搜索
+                binding.searchEditText.setText(recognizedText)
+                
+                // 自动触发搜索
+                if (recognizedText.isNotBlank()) {
+                    showSearchResults()
+                    viewModel.searchCities(recognizedText)
+                    Toast.makeText(this, "Searching for \"$recognizedText\"", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            Log.d("VoiceRecognition", "Intent voice recognition cancelled or failed")
+        }
+    }
+    
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
+        private const val MICROPHONE_PERMISSION_REQUEST_CODE = 1002
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -197,8 +231,7 @@ class MainActivity : AppCompatActivity() {
         
         // 麦克风按钮点击事件
         binding.micButton.setOnClickListener {
-            // TODO: 实现语音搜索功能
-            Toast.makeText(this, "语音搜索功能开发中", Toast.LENGTH_SHORT).show()
+            startVoiceRecognition()
         }
     }
     
@@ -617,6 +650,15 @@ class MainActivity : AppCompatActivity() {
                     Log.d("MainActivity", "定位权限被拒绝，使用默认城市")
                     viewModel.loadLocationWeatherData("Beijing")
                 }
+                // 加载用户已保存的城市
+                viewModel.loadSavedCities()
+            }
+            MICROPHONE_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Microphone permission granted, please tap the voice button again", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Microphone permission required for voice search", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
@@ -628,5 +670,315 @@ class MainActivity : AppCompatActivity() {
         // 刷新城市列表适配器以更新温度显示格式
         cityListAdapter.updateTemperatureUnit()
         cityListAdapter.notifyDataSetChanged()
+    }
+    
+    override fun finish() {
+        super.finish()
+        // 添加返回动画
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+    }
+    
+    // =====================================================================================
+    // 🎤 语音识别功能实现
+    // =====================================================================================
+    
+    /**
+     * 开始语音识别 - 改进版本，支持更多设备
+     */
+    private fun startVoiceRecognition() {
+        // 检查麦克风权限
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) 
+            != PackageManager.PERMISSION_GRANTED) {
+            // 请求麦克风权限
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.RECORD_AUDIO),
+                MICROPHONE_PERMISSION_REQUEST_CODE
+            )
+            return
+        }
+        
+        // 详细的设备和语音服务检查
+        Log.d("VoiceRecognition", "=== 语音识别设备检查 ===")
+        Log.d("VoiceRecognition", "设备型号: ${android.os.Build.MODEL}")
+        Log.d("VoiceRecognition", "设备厂商: ${android.os.Build.MANUFACTURER}")
+        Log.d("VoiceRecognition", "Android版本: ${android.os.Build.VERSION.RELEASE}")
+        
+        // 检查语音识别可用性
+        val isRecognitionAvailable = SpeechRecognizer.isRecognitionAvailable(this)
+        Log.d("VoiceRecognition", "SpeechRecognizer.isRecognitionAvailable(): $isRecognitionAvailable")
+        
+        // 检查可用的语音识别服务
+        try {
+            val packageManager = packageManager
+            val voiceIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            val activities = packageManager.queryIntentActivities(voiceIntent, PackageManager.MATCH_DEFAULT_ONLY)
+            Log.d("VoiceRecognition", "可用的语音识别服务数量: ${activities.size}")
+            activities.forEach { resolveInfo ->
+                Log.d("VoiceRecognition", "语音服务: ${resolveInfo.activityInfo.packageName}")
+            }
+            
+            // 如果有可用的语音识别服务，就尝试使用
+            if (activities.isNotEmpty()) {
+                Log.d("VoiceRecognition", "检测到语音识别服务，尝试启动...")
+                tryStartVoiceRecognition()
+                return
+            }
+        } catch (e: Exception) {
+            Log.e("VoiceRecognition", "检查语音服务时出错", e)
+        }
+        
+        // 如果标准检查失败，尝试使用Intent方式作为后备方案
+        if (!isRecognitionAvailable) {
+            Log.d("VoiceRecognition", "标准检查失败，尝试Intent后备方案...")
+            tryIntentBasedVoiceRecognition()
+            return
+        }
+        
+        // 标准方式启动
+        tryStartVoiceRecognition()
+    }
+    
+    /**
+     * 尝试启动标准语音识别
+     */
+    private fun tryStartVoiceRecognition() {
+        // 如果正在监听，停止监听
+        if (isListening) {
+            stopVoiceRecognition()
+            return
+        }
+        
+        // 开始语音识别
+        try {
+            initializeSpeechRecognizer()
+            startListening()
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Failed to start speech recognition", e)
+            // 如果标准方式失败，尝试Intent方式
+            Log.d("VoiceRecognition", "标准方式失败，尝试Intent方式...")
+            tryIntentBasedVoiceRecognition()
+        }
+    }
+    
+    /**
+     * Intent方式语音识别（后备方案）
+     */
+    private fun tryIntentBasedVoiceRecognition() {
+        try {
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US")
+                putExtra(RecognizerIntent.EXTRA_PROMPT, "Please say the city name in English")
+                putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
+            }
+            
+            // 检查是否有应用可以处理这个Intent
+            if (intent.resolveActivity(packageManager) != null) {
+                Log.d("VoiceRecognition", "启动Intent方式语音识别...")
+                voiceRecognitionLauncher.launch(intent)
+                Toast.makeText(this, "Please speak in English...", Toast.LENGTH_SHORT).show()
+            } else {
+                // 最终失败，显示友好的错误信息
+                showVoiceRecognitionUnavailable()
+            }
+        } catch (e: Exception) {
+            Log.e("VoiceRecognition", "Intent方式也失败", e)
+            showVoiceRecognitionUnavailable()
+        }
+    }
+    
+    /**
+     * 显示语音识别不可用的友好提示
+     */
+    private fun showVoiceRecognitionUnavailable() {
+        val message = when (android.os.Build.MANUFACTURER.lowercase()) {
+            "xiaomi" -> "请在系统设置中启用Google语音服务，或尝试安装Google应用"
+            "huawei" -> "请在设置中启用语音输入服务"
+            "oppo", "vivo" -> "请检查语音输入设置，确保已启用"
+            else -> "语音识别不可用，请检查系统语音服务设置"
+        }
+        
+        AlertDialog.Builder(this)
+            .setTitle("语音识别不可用")
+            .setMessage(message)
+            .setPositiveButton("去设置") { _, _ ->
+                try {
+                    // 尝试打开语音设置页面
+                    val settingsIntent = Intent().apply {
+                        action = "com.android.settings.TTS_SETTINGS"
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    if (settingsIntent.resolveActivity(packageManager) != null) {
+                        startActivity(settingsIntent)
+                    } else {
+                        // 如果具体设置页面不可用，打开通用设置
+                        startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(this, "无法打开设置页面", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("取消", null)
+            .show()
+    }
+    
+    /**
+     * 初始化语音识别器
+     */
+    private fun initializeSpeechRecognizer() {
+        speechRecognizer?.destroy()
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this).apply {
+            setRecognitionListener(object : RecognitionListener {
+                override fun onReadyForSpeech(params: Bundle?) {
+                    Log.d("VoiceRecognition", "准备好接收语音")
+                    isListening = true
+                    updateMicButtonState(true)
+                }
+                
+                override fun onBeginningOfSpeech() {
+                    Log.d("VoiceRecognition", "开始说话")
+                }
+                
+                override fun onRmsChanged(rmsdB: Float) {
+                    // 可以在这里添加音量指示器
+                }
+                
+                override fun onBufferReceived(buffer: ByteArray?) {
+                    // 接收到音频数据
+                }
+                
+                override fun onEndOfSpeech() {
+                    Log.d("VoiceRecognition", "说话结束")
+                    isListening = false
+                    updateMicButtonState(false)
+                }
+                
+                override fun onError(error: Int) {
+                    val errorMessage = when (error) {
+                        SpeechRecognizer.ERROR_AUDIO -> "Audio error"
+                        SpeechRecognizer.ERROR_CLIENT -> "Client error"
+                        SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Microphone permission required"
+                        SpeechRecognizer.ERROR_NETWORK -> "Network error"
+                        SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Network timeout"
+                        SpeechRecognizer.ERROR_NO_MATCH -> "No speech recognized"
+                        SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "Speech recognizer busy"
+                        SpeechRecognizer.ERROR_SERVER -> "Server error"
+                        SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Speech input timeout"
+                        else -> "Unknown error"
+                    }
+                    
+                    Log.e("VoiceRecognition", "Speech recognition error: $errorMessage (code: $error)")
+                    isListening = false
+                    updateMicButtonState(false)
+                    
+                    // 对于"没有匹配结果"的错误，给出更友好的提示
+                    if (error == SpeechRecognizer.ERROR_NO_MATCH) {
+                        Toast.makeText(this@MainActivity, "Please speak clearly in English and try again", Toast.LENGTH_SHORT).show()
+                    } else if (error != SpeechRecognizer.ERROR_CLIENT) {
+                        // 忽略客户端错误（通常是用户主动停止）
+                        Toast.makeText(this@MainActivity, "Speech recognition failed: $errorMessage", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                
+                override fun onResults(results: Bundle?) {
+                    val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                    if (!matches.isNullOrEmpty()) {
+                        val recognizedText = matches[0]
+                        Log.d("VoiceRecognition", "Recognition result: $recognizedText")
+                        
+                        // 将识别结果填入搜索框并执行搜索
+                        binding.searchEditText.setText(recognizedText)
+                        
+                        // 自动触发搜索
+                        if (recognizedText.isNotBlank()) {
+                            showSearchResults()
+                            viewModel.searchCities(recognizedText)
+                            Toast.makeText(this@MainActivity, "Searching for \"$recognizedText\"", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    
+                    isListening = false
+                    updateMicButtonState(false)
+                }
+                
+                override fun onPartialResults(partialResults: Bundle?) {
+                    // 部分结果，可以用于实时显示识别过程
+                    val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                    if (!matches.isNullOrEmpty()) {
+                        Log.d("VoiceRecognition", "部分结果: ${matches[0]}")
+                    }
+                }
+                
+                override fun onEvent(eventType: Int, params: Bundle?) {
+                    // 其他事件
+                }
+            })
+        }
+    }
+    
+    /**
+     * 开始监听
+     */
+    private fun startListening() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US") // 使用英文识别
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en-US") // 优先使用英文
+            putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, true) // 只返回首选语言结果
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Please say the city name in English")
+            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3) // 增加结果数量，提高识别准确性
+            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2000)
+            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2000)
+            // 添加英文识别优化参数
+            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false) // 使用在线识别获得更好效果
+        }
+        
+        speechRecognizer?.startListening(intent)
+        Toast.makeText(this, "Please speak in English...", Toast.LENGTH_SHORT).show()
+    }
+    
+    /**
+     * 停止语音识别
+     */
+    private fun stopVoiceRecognition() {
+        speechRecognizer?.stopListening()
+        speechRecognizer?.cancel()
+        isListening = false
+        updateMicButtonState(false)
+    }
+    
+    /**
+     * 更新麦克风按钮状态
+     */
+    private fun updateMicButtonState(listening: Boolean) {
+        if (listening) {
+            // 正在监听状态 - 改变按钮外观
+            binding.micButton.setColorFilter(
+                ContextCompat.getColor(this, android.R.color.holo_red_light)
+            )
+            binding.micButton.animate()
+                .scaleX(1.2f)
+                .scaleY(1.2f)
+                .setDuration(200)
+                .start()
+        } else {
+            // 正常状态
+            binding.micButton.clearColorFilter()
+            binding.micButton.animate()
+                .scaleX(1.0f)
+                .scaleY(1.0f)
+                .setDuration(200)
+                .start()
+        }
+    }
+    
+    /**
+     * 页面销毁时清理语音识别器
+     */
+    override fun onDestroy() {
+        super.onDestroy()
+        speechRecognizer?.destroy()
+        speechRecognizer = null
     }
 }

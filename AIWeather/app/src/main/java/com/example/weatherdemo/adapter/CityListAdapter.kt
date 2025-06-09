@@ -132,7 +132,7 @@ class CityListAdapter(
                     translationY = 0f                       // 重置位移
                 }
                 
-                // 4. 🔧 关键修复：根据当前编辑模式状态正确设置visibility
+
                 if (isEditMode) {
                     // 编辑模式：隐藏温度，显示删除按钮（如果允许删除）
                     temperatureContainer.visibility = android.view.View.GONE

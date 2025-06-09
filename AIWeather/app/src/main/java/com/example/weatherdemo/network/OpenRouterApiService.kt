@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 class OpenRouterApiService {
     
     // OpenRouter API配置
-    private val apiKey = "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"
+    private val apiKey = "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"
     private val baseUrl = "https://openrouter.ai/api/v1/chat/completions"
     
     private val okHttpClient: OkHttpClient by lazy {
