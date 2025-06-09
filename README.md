@@ -1,4 +1,4 @@
-# 🌤️ WeatherDemo - Android天气应用
+# 🌤️ AIWeather - Android天气应用
 
 > 一个使用Kotlin开发的Android天气应用，作为移动应用开发学习项目
 
@@ -89,8 +89,8 @@ implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
 1. **克隆项目**
    ```bash
-   git clone https://github.com/your-username/WeatherDemo.git
-   cd WeatherDemo
+   git clone https://github.com/ChrisKevinh/AIWeatherApp
+   cd AIWeather
    ```
 
 2. **配置API密钥** (必须)
