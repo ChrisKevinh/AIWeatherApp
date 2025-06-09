@@ -60,6 +60,7 @@
 - **Kotlin协程** - 异步操作处理
 - **ViewBinding** - 视图绑定
 - **Material Design** - UI设计规范
+- **语音识别** - 使用Android原生SpeechRecognizer API实现英文语音输入
 
 ### 第三方库
 ```gradle
@@ -87,6 +88,11 @@ implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 - Android Studio 2022.3.1 或更高版本
 - Android SDK API 24 (Android 7.0) 及以上
 - JDK 11 或更高版本
+
+### 权限要求
+- **网络权限** - 获取天气数据
+- **位置权限** - 自动获取当前位置天气
+- **麦克风权限** - 语音输入功能
 
 ### 安装步骤
 
@@ -136,7 +142,7 @@ implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
 ```
 app/src/main/java/com/example/weatherdemo/
-├── MainActivity.kt                      # 主界面活动
+├── MainActivity.kt                      # 主界面活动（包含语音输入功能）
 ├── CityDetailActivity.kt               # 城市详情页面
 ├── AIWeatherAssistantActivity.kt       # AI助手页面
 ├── SettingsActivity.kt                 # 设置页面
@@ -166,6 +172,7 @@ app/src/main/java/com/example/weatherdemo/
     └── [小部件相关文件]
 ```
 
+
 ## 🔧 常见问题
 
 **Q: 应用显示"获取天气数据失败"**
@@ -183,6 +190,10 @@ A: 确保Android Studio版本符合要求，执行 `./gradlew clean` 后重新�
 **Q: 获取不到AI回复**
 A: 确保OpenRouter Api Key是否正确配置，前往官网检查ApiKey是否过期
 
+**Q: 语音输入不工作**
+A: 检查麦克风权限是否授予，确保设备安装了Google语音服务或对应厂商的语音服务
+
+
 
 ## 📝 学习心得
 
@@ -194,7 +205,8 @@ A: 确保OpenRouter Api Key是否正确配置，前往官网检查ApiKey是否�
 4. **数据库操作** - 掌握Room数据库（SQLite）的使用方法
 5. **UI设计** - 学习Material Design设计原则和实现
 6. **异步编程** - 使用Kotlin协程处理后台任务
-7. **项目管理** - 使用Git进行版本控制和代码管理
+7. **语音识别** - 学习Android语音识别API的使用和设备兼容性处理
+8. **项目管理** - 使用Git进行版本控制和代码管理
 
 ## 📊 数据来源
 
@@ -204,6 +216,7 @@ A: 确保OpenRouter Api Key是否正确配置，前往官网检查ApiKey是否�
 ## 🔒 隐私说明
 
 - 位置权限仅用于获取当前位置天气
+- 麦克风权限仅用于识别输入信息
 - 不收集任何个人信息
 - 所有数据来源于公开的天气API
 - AI回复内容来源于OpenRouter提供的DeepSeek R1大模型
