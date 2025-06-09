@@ -106,11 +106,6 @@ implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
    - 访问 [OpenRouter.ai](https://openrouter.ai/) 获取API密钥
    - 在 `OpenRouterApiService.kt` 中配置密钥
 
-4. **构建运行**
-   ```bash
-   ./gradlew assembleDebug
-   ./gradlew installDebug
-   ```
 
 ## 📱 使用说明
 
