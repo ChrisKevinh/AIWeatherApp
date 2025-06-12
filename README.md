@@ -35,9 +35,6 @@
 - **温度趋势图** - 24小时温度变化曲线
 - **降水量图表** - 24小时降水概率图
 
-### 🎤 语音输入
-- **英文语音识别** - 可用语音识别进行输入
-
 ### 🤖 AI功能
 - **智能天气分析** - AI助手根据当地天气状况提供天气总结、出行建议、生活贴心提醒、健康关怀
 - **切换城市** - 可以选择不同城市进行AI分析，提供智能建议
@@ -60,7 +57,6 @@
 - **Kotlin协程** - 异步操作处理
 - **ViewBinding** - 视图绑定
 - **Material Design** - UI设计规范
-- **语音识别** - 使用Android原生SpeechRecognizer API实现英文语音输入
 
 ### 第三方库
 ```gradle
@@ -89,11 +85,6 @@ implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 - Android SDK API 24 (Android 7.0) 及以上
 - JDK 11 或更高版本
 
-### 权限要求
-- **网络权限** - 获取天气数据
-- **位置权限** - 自动获取当前位置天气
-- **麦克风权限** - 语音输入功能
-
 ### 安装步骤
 
 1. **克隆项目**
@@ -115,16 +106,9 @@ implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 
 3. **可选：配置AI功能**
    
-   ⚠️ **重要警示！！** ⚠️
-   
-   **如果您是通过clone获取的此项目，AI功能大概率无法直接使用！**
-   
-   原因：项目中的OpenRouter API密钥因为在GitHub上暴露，已被系统自动撤销失效。
-   
-   **要使用AI助手功能，您必须：**
-   - 访问 [OpenRouter.ai](https://openrouter.ai/) 自行注册并获取新的API密钥
-   - 在 `OpenRouterApiService.kt` 中替换为您自己的API密钥
-   - ⚠️ **切记不要将您的API密钥提交到公共仓库！**
+   如果要使用AI助手功能：
+   - 访问 [OpenRouter.ai](https://openrouter.ai/) 获取API密钥
+   - 在 `OpenRouterApiService.kt` 中配置密钥
 
 
 ## 📱 使用说明
@@ -132,6 +116,8 @@ implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 ### 基本操作
 - **查看天气** - 打开应用显示当前定位城市天气信息以及用户添加的城市天气信息
 - **城市详情** - 点击城市卡片查看详细信息
+- **24小时预报** - 在城市详情页面查看未来24小时天气预报，包含温度、降水概率和天气图标
+- **未来10天预报** - 在城市详情页面查看未来10天的天气预报，包含最低温度、最高温度和天气
 - **搜索城市** - 点击搜索按钮输入城市名称
 - **添加城市** - 搜索后点击城市详情页右上角添加按钮添加到列表
 - **编辑城市** - 点击右上角菜单按钮，再点击编辑列表进入编辑模式
@@ -140,16 +126,14 @@ implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
 ### 高级功能
 - **AI助手** - 点击右上角AI机器人按钮进入AI助手界面，还可以自由选择城市获取AI智能天气分析
 - **趋势分析** - 在详情页面查看可视化图表：24小时温度变化图、24小时降水概率图
-- **语音输入** - 点击搜索栏右侧麦克风按钮可以实现语音输入
 - **温度单位切换** - 点击右上角菜单按钮中的单位设置按钮，可以切换温度为摄氏度、华氏度显示
 - **Widget** - Widget小组件显示当前定位城市简要天气信息
-
 
 ## 📁 项目结构
 
 ```
 app/src/main/java/com/example/weatherdemo/
-├── MainActivity.kt                      # 主界面活动（包含语音输入功能）
+├── MainActivity.kt                      # 主界面活动
 ├── CityDetailActivity.kt               # 城市详情页面
 ├── AIWeatherAssistantActivity.kt       # AI助手页面
 ├── SettingsActivity.kt                 # 设置页面
@@ -179,7 +163,6 @@ app/src/main/java/com/example/weatherdemo/
     └── [小部件相关文件]
 ```
 
-
 ## 🔧 常见问题
 
 **Q: 应用显示"获取天气数据失败"**
@@ -197,11 +180,6 @@ A: 确保Android Studio版本符合要求，执行 `./gradlew clean` 后重新�
 **Q: 获取不到AI回复**
 A: 确保OpenRouter Api Key是否正确配置，前往官网检查ApiKey是否过期
 
-**Q: 语音输入不工作**
-A: 检查麦克风权限是否授予，确保设备安装了Google语音服务或对应厂商的语音服务
-
-
-
 ## 📝 学习心得
 
 通过开发这个项目，我学到了：
@@ -212,8 +190,7 @@ A: 检查麦克风权限是否授予，确保设备安装了Google语音服务�
 4. **数据库操作** - 掌握Room数据库（SQLite）的使用方法
 5. **UI设计** - 学习Material Design设计原则和实现
 6. **异步编程** - 使用Kotlin协程处理后台任务
-7. **语音识别** - 学习Android语音识别API的使用和设备兼容性处理
-8. **项目管理** - 使用Git进行版本控制和代码管理
+7. **项目管理** - 使用Git进行版本控制和代码管理
 
 ## 📊 数据来源
 
@@ -223,7 +200,6 @@ A: 检查麦克风权限是否授予，确保设备安装了Google语音服务�
 ## 🔒 隐私说明
 
 - 位置权限仅用于获取当前位置天气
-- 麦克风权限仅用于识别输入信息
 - 不收集任何个人信息
 - 所有数据来源于公开的天气API
 - AI回复内容来源于OpenRouter提供的DeepSeek R1大模型
