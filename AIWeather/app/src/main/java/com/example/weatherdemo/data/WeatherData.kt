@@ -1,10 +1,14 @@
 package com.example.weatherdemo.data
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-@Entity(tableName = "weather_data")
+@Entity(
+    tableName = "weather_data",
+    indices = [Index(value = ["cityName"], unique = true)]
+)
 data class WeatherData(
     @PrimaryKey
     val id: String,
