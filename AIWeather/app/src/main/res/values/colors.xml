@@ -75,4 +75,7 @@
     <!-- 现代化对话框颜色 -->
     <color name="modern_dialog_background">#E62C3A47</color>
     <color name="about_dialog_background">#CC000000</color>
+    
+    <!-- 24小时天气预报相关颜色 -->
+    <color name="rain_probability_color">#CCFFFFFF</color> <!-- 白色80%透明度，确保在任何背景上都清晰 -->
 </resources>

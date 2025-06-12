@@ -269,12 +269,51 @@
 
                 </androidx.cardview.widget.CardView>
 
+                <!-- 24小时天气预报 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/hourlyForecastCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/weatherDetailCard"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/card_background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="24小时天气预报"
+                            android:textColor="@color/white_60"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="16dp" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/hourlyWeatherRecyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:scrollbars="none"
+                            android:clipToPadding="false"
+                            android:paddingHorizontal="4dp" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
                 <!-- 24小时数据可视化图表 -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/chartsCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/weatherDetailCard"
+                    android:layout_below="@id/hourlyForecastCard"
                     android:layout_marginTop="16dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp"

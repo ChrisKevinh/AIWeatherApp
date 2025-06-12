@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:gravity="center"
+    android:background="@drawable/hourly_weather_card_background"
+    android:layout_marginHorizontal="4dp">
+
+    <!-- 时间 -->
+    <TextView
+        android:id="@+id/timeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="现在"
+        android:textColor="@color/white_80"
+        android:textSize="12sp"
+        android:textStyle="normal" />
+
+    <!-- 天气图标 -->
+    <ImageView
+        android:id="@+id/weatherIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_weather_sunny"
+        android:scaleType="fitCenter" />
+
+    <!-- 降雨概率 -->
+    <TextView
+        android:id="@+id/rainProbabilityText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="50%"
+        android:textColor="@color/rain_probability_color"
+        android:textSize="11sp"
+        android:textStyle="normal" />
+
+    <!-- 温度 -->
+    <TextView
+        android:id="@+id/temperatureText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="27°"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+</LinearLayout> 

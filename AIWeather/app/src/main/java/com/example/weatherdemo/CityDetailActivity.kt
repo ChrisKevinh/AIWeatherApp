@@ -13,6 +13,8 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherdemo.adapter.ForecastAdapter
+import com.example.weatherdemo.adapter.HourlyWeatherAdapter
+import com.example.weatherdemo.data.HourlyWeatherData
 import com.example.weatherdemo.databinding.ActivityCityDetailBinding
 import com.example.weatherdemo.ui.WeatherChartHelper
 import com.example.weatherdemo.utils.SettingsManager
@@ -28,6 +30,7 @@ class CityDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCityDetailBinding
     private lateinit var viewModel: WeatherViewModel
     private lateinit var forecastAdapter: ForecastAdapter
+    private lateinit var hourlyWeatherAdapter: HourlyWeatherAdapter
     
     // 图表组件
     private lateinit var temperatureChart: LineChart
@@ -129,6 +132,13 @@ class CityDetailActivity : AppCompatActivity() {
             adapter = forecastAdapter
         }
         
+        // 设置24小时天气预报列表
+        hourlyWeatherAdapter = HourlyWeatherAdapter(this)
+        binding.hourlyWeatherRecyclerView.apply {
+            layoutManager = LinearLayoutManager(this@CityDetailActivity, LinearLayoutManager.HORIZONTAL, false)
+            adapter = hourlyWeatherAdapter
+        }
+        
         // 初始化图表组件
         temperatureChart = binding.temperatureChart
         precipitationChart = binding.precipitationChart
@@ -217,11 +227,29 @@ class CityDetailActivity : AppCompatActivity() {
             }
         }
         
-        // 观察小时级天气数据并更新图表
+        // 观察小时级天气数据并更新图表和24小时预报
         viewModel.hourlyWeatherData.observe(this) { hourlyDataList ->
-            if (hourlyDataList.isNotEmpty()) {
+            Log.d("HourlyWeather", "观察到小时数据变化：${hourlyDataList?.size ?: 0}条")
+            
+            if (hourlyDataList != null && hourlyDataList.isNotEmpty()) {
                 WeatherChartHelper.setupTemperatureChart(this, temperatureChart, hourlyDataList)
                 WeatherChartHelper.setupPrecipitationChart(this, precipitationChart, hourlyDataList)
+                
+                // 更新24小时天气预报
+                updateHourlyWeatherForecast(hourlyDataList)
+            } else {
+                // 如果没有数据，生成一些测试数据用于调试
+                Log.d("HourlyWeather", "小时数据为空，生成测试数据")
+                val testData = generateTestHourlyData()
+                updateHourlyWeatherForecast(testData)
+            }
+        }
+        
+        // 主动检查是否已有数据（防止观察者错过已存在的数据）
+        viewModel.hourlyWeatherData.value?.let { existingData ->
+            Log.d("HourlyWeather", "发现已存在的小时数据：${existingData.size}条")
+            if (existingData.isNotEmpty()) {
+                updateHourlyWeatherForecast(existingData)
             }
         }
     }
@@ -330,6 +358,41 @@ class CityDetailActivity : AppCompatActivity() {
     }
     
     /**
+     * 更新24小时天气预报
+     */
+    private fun updateHourlyWeatherForecast(hourlyDataList: List<HourlyWeatherData>) {
+        Log.d("HourlyWeather", "收到小时数据：${hourlyDataList.size}条")
+        
+        // 获取接下来24小时的数据
+        val next24Hours = getNext24Hours(hourlyDataList)
+        Log.d("HourlyWeather", "筛选后数据：${next24Hours.size}条")
+        
+        hourlyWeatherAdapter.updateHourlyData(next24Hours)
+    }
+    
+    /**
+     * 从小时数据中获取接下来24小时的数据
+     */
+    private fun getNext24Hours(hourlyDataList: List<HourlyWeatherData>): List<HourlyWeatherData> {
+        if (hourlyDataList.isEmpty()) {
+            Log.d("HourlyWeather", "输入数据为空")
+            return emptyList()
+        }
+        
+        // 先取前24条数据，不进行时间筛选，因为可能时间戳筛选过于严格
+        val result = hourlyDataList
+            .sortedBy { it.hour } // 按小时排序而不是时间戳
+            .take(24)
+        
+        Log.d("HourlyWeather", "最终返回数据：${result.size}条")
+        result.forEach { 
+            Log.d("HourlyWeather", "时间：${it.hour}时，温度：${it.temperature}°，降雨：${it.chanceOfRain}%")
+        }
+        
+        return result
+    }
+    
+    /**
      * 刷新温度显示 - 当温度单位变化时调用
      */
     private fun refreshTemperatureDisplay() {
@@ -344,12 +407,58 @@ class CityDetailActivity : AppCompatActivity() {
         // 2. 刷新预报数据显示
         forecastAdapter.notifyDataSetChanged()
         
-        // 3. 重新绘制图表
+        // 3. 刷新24小时天气预报显示
+        hourlyWeatherAdapter.notifyDataSetChanged()
+        
+        // 4. 重新绘制图表
         viewModel.hourlyWeatherData.value?.let { hourlyDataList ->
             if (hourlyDataList.isNotEmpty()) {
                 WeatherChartHelper.setupTemperatureChart(this, temperatureChart, hourlyDataList)
                 WeatherChartHelper.setupPrecipitationChart(this, precipitationChart, hourlyDataList)
             }
         }
+    }
+    
+    /**
+     * 生成测试的24小时天气数据（用于调试）
+     */
+    private fun generateTestHourlyData(): List<HourlyWeatherData> {
+        val testData = mutableListOf<HourlyWeatherData>()
+        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val currentTime = System.currentTimeMillis()
+        
+        for (i in 0 until 24) {
+            val hour = (currentHour + i) % 24
+            val temperature = 25.0 + (Math.random() * 10 - 5) // 20-30度随机
+            val chanceOfRain = (Math.random() * 100).toInt() // 0-100%随机
+            
+            val hourlyData = HourlyWeatherData(
+                id = "test_${hour}",
+                cityName = "测试城市",
+                date = "2023-12-08",
+                hour = hour,
+                timeEpoch = currentTime + (i * 3600000L), // 每小时递增
+                temperature = temperature,
+                feelsLike = temperature + 2,
+                humidity = 60,
+                pressure = 1013.0,
+                windSpeed = 10.0,
+                windDegree = 180,
+                precipitationMm = 0.0,
+                chanceOfRain = chanceOfRain,
+                chanceOfSnow = 0,
+                cloudCover = 50,
+                visibility = 10.0,
+                uvIndex = 5.0,
+                isDayTime = hour in 6..18,
+                weatherDescription = if (chanceOfRain > 50) "多云有雨" else "晴朗",
+                weatherIcon = "sunny"
+            )
+            
+            testData.add(hourlyData)
+        }
+        
+        Log.d("HourlyWeather", "生成了${testData.size}条测试数据")
+        return testData
     }
 }
