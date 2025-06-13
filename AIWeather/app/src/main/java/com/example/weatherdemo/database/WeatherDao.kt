@@ -129,4 +129,7 @@ interface WeatherDao {
     
     @Query("DELETE FROM astro_data WHERE timestamp < :timestamp")
     suspend fun deleteOldAstroData(timestamp: Long)
+    
+    @Query("SELECT * FROM hourly_weather_data WHERE cityName = :cityName ORDER BY timeEpoch ASC")
+    suspend fun getAllHourlyWeatherDataByCity(cityName: String): List<HourlyWeatherData>
 } 

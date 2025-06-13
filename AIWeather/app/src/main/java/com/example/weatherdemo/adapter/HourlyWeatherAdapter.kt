@@ -105,11 +105,22 @@ class HourlyWeatherAdapter(private val context: Context) : RecyclerView.Adapter<
      * @return 格式化后的时间字符串
      */
     private fun formatHourTime(hour: Int, position: Int): String {
-        return if (position == 0) {
-            // 第一个位置显示"现在"
-            "现在"
+        if (position == 0) {
+            return "现在"
+        }
+        
+        // 对于其他位置，检查是否需要显示日期
+        val data = hourlyData[position]
+        val currentTime = System.currentTimeMillis()
+        val dataTime = data.timeEpoch * 1000
+        
+        val currentCalendar = Calendar.getInstance().apply { timeInMillis = currentTime }
+        val dataCalendar = Calendar.getInstance().apply { timeInMillis = dataTime }
+        
+        // 如果是不同天，显示"明天xx时"，否则只显示"xx时"
+        return if (currentCalendar.get(Calendar.DAY_OF_YEAR) != dataCalendar.get(Calendar.DAY_OF_YEAR)) {
+            "明天${hour}时"
         } else {
-            // 返回小时格式，如 "1时", "14时"
             "${hour}时"
         }
     }

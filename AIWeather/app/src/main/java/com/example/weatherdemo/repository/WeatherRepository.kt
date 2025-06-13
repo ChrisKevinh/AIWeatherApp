@@ -526,8 +526,8 @@ class WeatherRepository(
             Log.d("WeatherRepository", "获取小时级天气数据：$cityName, 日期：$targetDate")
             
             try {
-                // 先检查本地数据
-                val localData = weatherDao.getHourlyWeatherData(cityName, targetDate)
+                // 先检查本地数据（查询所有相关数据支持跨天）
+                val localData = weatherDao.getAllHourlyWeatherDataByCity(cityName)
                 
                 // 如果本地有数据且不超过1小时，直接返回
                 if (localData.isNotEmpty() && !isDataExpired(localData.first().timestamp)) {
@@ -535,54 +535,58 @@ class WeatherRepository(
                     return@withContext Result.success(localData)
                 }
                 
-                // 从网络获取当日天气（包含24小时数据）
-                val networkResult = apiService.getCurrentWeatherAndForecast(cityName, 1)
+                // 从网络获取2天天气数据（包含48小时数据，支持跨天24小时预报）
+                val networkResult = apiService.getCurrentWeatherAndForecast(cityName, 2)
                 
                 networkResult.fold(
                     onSuccess = { weatherResponse ->
                         val hourlyDataList = mutableListOf<HourlyWeatherData>()
                         
-                        // 转换今日的小时级数据
-                        val todayForecast = weatherResponse.forecast.forecastday.firstOrNull()
-                        todayForecast?.hour?.forEach { hour ->
-                            val hourlyData = HourlyWeatherData(
-                                id = "${cityName}_${targetDate}_${hour.time.substring(11, 13)}", // 提取小时部分
-                                cityName = cityName,
-                                date = targetDate,
-                                hour = hour.time.substring(11, 13).toInt(), // 提取小时数
-                                timeEpoch = hour.timeEpoch,
-                                temperature = if (hour.tempC.isFinite()) hour.tempC else 20.0,
-                                feelsLike = if (hour.feelslikeC.isFinite()) hour.feelslikeC else hour.tempC,
-                                humidity = hour.humidity.coerceIn(0, 100),
-                                pressure = if (hour.pressureMb.isFinite()) hour.pressureMb else 1013.0,
-                                windSpeed = if (hour.windKph.isFinite()) hour.windKph else 0.0,
-                                windDegree = hour.windDegree.coerceIn(0, 360),
-                                precipitationMm = if (hour.precipMm.isFinite()) hour.precipMm else 0.0,
-                                chanceOfRain = hour.chanceOfRain.coerceIn(0, 100),
-                                chanceOfSnow = hour.chanceOfSnow.coerceIn(0, 100),
-                                cloudCover = hour.cloud.coerceIn(0, 100),
-                                visibility = if (hour.visKm.isFinite()) hour.visKm else 10.0,
-                                uvIndex = if (hour.uv.isFinite()) hour.uv else 0.0,
-                                isDayTime = hour.isDay == 1,
-                                weatherDescription = hour.condition.text.ifEmpty { "未知" },
-                                weatherIcon = hour.condition.icon
-                            )
-                            hourlyDataList.add(hourlyData)
+                        // 转换所有天的小时级数据（支持跨天24小时预报）
+                        weatherResponse.forecast.forecastday.forEach { forecastDay ->
+                            forecastDay.hour.forEach { hour ->
+                                val hourlyData = HourlyWeatherData(
+                                    id = "${cityName}_${forecastDay.date}_${hour.time.substring(11, 13)}", // 使用具体日期
+                                    cityName = cityName,
+                                    date = forecastDay.date, // 使用实际的日期
+                                    hour = hour.time.substring(11, 13).toInt(), // 提取小时数
+                                    timeEpoch = hour.timeEpoch,
+                                    temperature = if (hour.tempC.isFinite()) hour.tempC else 20.0,
+                                    feelsLike = if (hour.feelslikeC.isFinite()) hour.feelslikeC else hour.tempC,
+                                    humidity = hour.humidity.coerceIn(0, 100),
+                                    pressure = if (hour.pressureMb.isFinite()) hour.pressureMb else 1013.0,
+                                    windSpeed = if (hour.windKph.isFinite()) hour.windKph else 0.0,
+                                    windDegree = hour.windDegree.coerceIn(0, 360),
+                                    precipitationMm = if (hour.precipMm.isFinite()) hour.precipMm else 0.0,
+                                    chanceOfRain = hour.chanceOfRain.coerceIn(0, 100),
+                                    chanceOfSnow = hour.chanceOfSnow.coerceIn(0, 100),
+                                    cloudCover = hour.cloud.coerceIn(0, 100),
+                                    visibility = if (hour.visKm.isFinite()) hour.visKm else 10.0,
+                                    uvIndex = if (hour.uv.isFinite()) hour.uv else 0.0,
+                                    isDayTime = hour.isDay == 1,
+                                    weatherDescription = hour.condition.text.ifEmpty { "未知" },
+                                    weatherIcon = hour.condition.icon
+                                )
+                                hourlyDataList.add(hourlyData)
+                            }
                         }
                         
                         // 保存到数据库
                         if (hourlyDataList.isNotEmpty()) {
-                            // 先删除旧数据，再插入新数据
-                            weatherDao.deleteHourlyWeatherDataByCity(cityName, targetDate)
+                            // 按日期分组删除旧数据，再插入新数据
+                            val dateGroups = hourlyDataList.groupBy { it.date }
+                            dateGroups.keys.forEach { date ->
+                                weatherDao.deleteHourlyWeatherDataByCity(cityName, date)
+                            }
                             weatherDao.insertHourlyWeatherDataList(hourlyDataList)
-                            Log.d("WeatherRepository", "保存小时级数据：${hourlyDataList.size}条记录")
+                            Log.d("WeatherRepository", "保存小时级数据：${hourlyDataList.size}条记录，涵盖${dateGroups.size}天")
                         }
                         
                         Result.success(hourlyDataList)
                     },
                     onFailure = { exception ->
                         // 网络失败，返回本地缓存（如果有的话）
-                        val localData = weatherDao.getHourlyWeatherData(cityName, targetDate)
+                        val localData = weatherDao.getAllHourlyWeatherDataByCity(cityName)
                         if (localData.isNotEmpty()) {
                             Log.d("WeatherRepository", "网络失败，返回本地小时级缓存：${localData.size}条记录")
                             Result.success(localData)
@@ -594,7 +598,7 @@ class WeatherRepository(
             } catch (e: Exception) {
                 Log.e("WeatherRepository", "获取小时级数据异常", e)
                 // 异常时也尝试返回本地缓存
-                val localData = weatherDao.getHourlyWeatherData(cityName, targetDate)
+                val localData = weatherDao.getAllHourlyWeatherDataByCity(cityName)
                 if (localData.isNotEmpty()) {
                     Result.success(localData)
                 } else {

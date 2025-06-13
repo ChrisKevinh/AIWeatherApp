@@ -379,14 +379,46 @@ class CityDetailActivity : AppCompatActivity() {
             return emptyList()
         }
         
-        // 先取前24条数据，不进行时间筛选，因为可能时间戳筛选过于严格
-        val result = hourlyDataList
-            .sortedBy { it.hour } // 按小时排序而不是时间戳
-            .take(24)
+        val currentTimeMillis = System.currentTimeMillis()
+        Log.d("HourlyWeather", "当前时间戳：$currentTimeMillis")
+        
+        // 按时间戳排序，确保数据按时间顺序排列
+        val sortedList = hourlyDataList.sortedBy { it.timeEpoch }
+        
+        // 找到当前时间之后的第一个数据点（或最接近的）
+        val startIndex = sortedList.indexOfFirst { it.timeEpoch * 1000 >= currentTimeMillis }
+        val actualStartIndex = if (startIndex == -1) {
+            // 如果找不到未来的数据，找最接近当前时间的数据
+            var closestIndex = 0
+            var minDiff = Math.abs(sortedList[0].timeEpoch * 1000 - currentTimeMillis)
+            sortedList.forEachIndexed { index, data ->
+                val diff = Math.abs(data.timeEpoch * 1000 - currentTimeMillis)
+                if (diff < minDiff) {
+                    minDiff = diff
+                    closestIndex = index
+                }
+            }
+            Log.d("HourlyWeather", "使用最接近当前时间的数据点，索引：$closestIndex")
+            closestIndex
+        } else {
+            Log.d("HourlyWeather", "找到当前时间之后的数据点，索引：$startIndex")
+            startIndex
+        }
+        
+        // 从找到的位置开始取24小时的数据
+        val result = if (actualStartIndex + 24 <= sortedList.size) {
+            // 如果后面还有足够的数据
+            sortedList.subList(actualStartIndex, actualStartIndex + 24)
+        } else {
+            // 如果后面的数据不够24小时，就取到最后
+            sortedList.subList(actualStartIndex, sortedList.size)
+        }
         
         Log.d("HourlyWeather", "最终返回数据：${result.size}条")
         result.forEach { 
-            Log.d("HourlyWeather", "时间：${it.hour}时，温度：${it.temperature}°，降雨：${it.chanceOfRain}%")
+            val timeStr = java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault())
+                .format(java.util.Date(it.timeEpoch * 1000))
+            Log.d("HourlyWeather", "时间：$timeStr，温度：${it.temperature}°，降雨：${it.chanceOfRain}%")
         }
         
         return result
