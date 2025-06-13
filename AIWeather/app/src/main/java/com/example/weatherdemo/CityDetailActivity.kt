@@ -379,16 +379,18 @@ class CityDetailActivity : AppCompatActivity() {
             return emptyList()
         }
         
+        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val currentTimeMillis = System.currentTimeMillis()
-        Log.d("HourlyWeather", "当前时间戳：$currentTimeMillis")
+        Log.d("HourlyWeather", "当前时间：${currentHour}时，时间戳：$currentTimeMillis")
         
         // 按时间戳排序，确保数据按时间顺序排列
         val sortedList = hourlyDataList.sortedBy { it.timeEpoch }
         
-        // 找到当前时间之后的第一个数据点（或最接近的）
-        val startIndex = sortedList.indexOfFirst { it.timeEpoch * 1000 >= currentTimeMillis }
-        val actualStartIndex = if (startIndex == -1) {
-            // 如果找不到未来的数据，找最接近当前时间的数据
+        // 找到当前小时或最接近当前小时的数据点
+        var startIndex = sortedList.indexOfFirst { it.hour == currentHour }
+        
+        if (startIndex == -1) {
+            // 如果找不到当前小时的数据，找最接近当前时间的数据
             var closestIndex = 0
             var minDiff = Math.abs(sortedList[0].timeEpoch * 1000 - currentTimeMillis)
             sortedList.forEachIndexed { index, data ->
@@ -398,27 +400,26 @@ class CityDetailActivity : AppCompatActivity() {
                     closestIndex = index
                 }
             }
-            Log.d("HourlyWeather", "使用最接近当前时间的数据点，索引：$closestIndex")
-            closestIndex
+            Log.d("HourlyWeather", "未找到当前小时(${currentHour})的数据，使用最接近的数据点，索引：$closestIndex")
+            startIndex = closestIndex
         } else {
-            Log.d("HourlyWeather", "找到当前时间之后的数据点，索引：$startIndex")
-            startIndex
+            Log.d("HourlyWeather", "找到当前小时(${currentHour})的数据点，索引：$startIndex")
         }
         
         // 从找到的位置开始取24小时的数据
-        val result = if (actualStartIndex + 24 <= sortedList.size) {
+        val result = if (startIndex + 24 <= sortedList.size) {
             // 如果后面还有足够的数据
-            sortedList.subList(actualStartIndex, actualStartIndex + 24)
+            sortedList.subList(startIndex, startIndex + 24)
         } else {
             // 如果后面的数据不够24小时，就取到最后
-            sortedList.subList(actualStartIndex, sortedList.size)
+            sortedList.subList(startIndex, sortedList.size)
         }
         
         Log.d("HourlyWeather", "最终返回数据：${result.size}条")
         result.forEach { 
             val timeStr = java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault())
                 .format(java.util.Date(it.timeEpoch * 1000))
-            Log.d("HourlyWeather", "时间：$timeStr，温度：${it.temperature}°，降雨：${it.chanceOfRain}%")
+            Log.d("HourlyWeather", "时间：$timeStr (${it.hour}时)，温度：${it.temperature}°，降雨：${it.chanceOfRain}%")
         }
         
         return result
