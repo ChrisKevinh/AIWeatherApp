@@ -12,31 +12,28 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
- * 天气图表工具类
- * 用于配置和绘制天气相关的数据可视化图表
+ * 天气图表工具类 - 全新简化版本
+ * 🔄 完全重写：移除所有复杂逻辑，实现简洁稳定的图表显示
  */
 class WeatherChartHelper {
 
     companion object {
         
-        // 常量定义
-        private const val MIN_PRECIPITATION_THRESHOLD = 10 // 最小显示降水概率阈值
-        private const val TEMPERATURE_GRANULARITY = 5f // 温度Y轴刻度间隔
-        private const val PRECIPITATION_GRANULARITY = 20f // 降水概率Y轴刻度间隔
-        private const val BAR_WIDTH = 0.7f // 柱状图宽度
-        private const val VISIBLE_X_RANGE_MAX = 12f // 可见X轴范围
-        
-        // 重点显示的时间点（每3小时）
-        private val KEY_HOURS = setOf(0, 3, 6, 9, 12, 15, 18, 21)
+        // 简化的常量定义
+        private const val MIN_PRECIPITATION_DISPLAY = 10 // 最小显示降水概率
+        private const val LABEL_INTERVAL_HOURS = 3 // 每3小时显示一个标签
         
         /**
-         * 配置24小时温度曲线图
+         * 设置24小时温度折线图
+         * 🔄 全新实现：使用自定义图表解决标签位置问题
          */
         fun setupTemperatureChart(
             context: Context,
-            lineChart: LineChart,
+            lineChart: CustomLineChart,
             hourlyData: List<HourlyWeatherData>
         ) {
             if (hourlyData.isEmpty()) {
@@ -44,35 +41,31 @@ class WeatherChartHelper {
                 return
             }
 
-            // 获取设置管理器
             val settingsManager = SettingsManager.getInstance(context)
-
-            // 数据验证和准备
-            val validatedData = validateHourlyData(hourlyData)
+            
+            // 简单数据处理：按时间排序，最多取24个数据点
+            val sortedData = hourlyData
+                .sortedBy { it.timeEpoch }
+                .take(24)
+            
+            // 生成简洁的时间标签
+            val timeLabels = generateSimpleTimeLabels(sortedData)
+            
+            // 创建温度数据点 - 只保留实际气温
             val temperatureEntries = mutableListOf<Entry>()
-            val feelsLikeEntries = mutableListOf<Entry>()
-            val timeLabels = generateTimeLabels(validatedData)
-
-            // 根据验证后的数据生成图表点 - 支持温度单位转换
-            validatedData.forEachIndexed { index, data ->
+            
+            sortedData.forEachIndexed { index, data ->
                 val actualTemp = if (settingsManager.isCelsius()) {
                     data.temperature.toFloat()
                 } else {
                     settingsManager.celsiusToFahrenheit(data.temperature).toFloat()
                 }
                 
-                val feelsLikeTemp = if (settingsManager.isCelsius()) {
-                    data.feelsLike.toFloat()
-                } else {
-                    settingsManager.celsiusToFahrenheit(data.feelsLike).toFloat()
-                }
-                
                 temperatureEntries.add(Entry(index.toFloat(), actualTemp))
-                feelsLikeEntries.add(Entry(index.toFloat(), feelsLikeTemp))
             }
 
-            // 创建温度线
-            val temperatureDataSet = LineDataSet(temperatureEntries, "实际温度").apply {
+            // 创建实际温度线
+            val temperatureDataSet = LineDataSet(temperatureEntries, "气温").apply {
                 color = ContextCompat.getColor(context, R.color.white)
                 setCircleColor(ContextCompat.getColor(context, R.color.white))
                 lineWidth = 3f
@@ -89,34 +82,26 @@ class WeatherChartHelper {
                 }
             }
 
-            // 创建体感温度线
-            val feelsLikeDataSet = LineDataSet(feelsLikeEntries, "体感温度").apply {
-                color = ContextCompat.getColor(context, R.color.white_60)
-                setCircleColor(ContextCompat.getColor(context, R.color.white_60))
-                lineWidth = 2f
-                circleRadius = 3f
-                setDrawFilled(false)
-                setDrawValues(false)
-                enableDashedLine(10f, 5f, 0f)
-            }
-
-            // 设置数据
-            val lineData = LineData(temperatureDataSet, feelsLikeDataSet)
+            // 设置数据 - 只包含实际气温曲线
+            val lineData = LineData(temperatureDataSet)
             lineChart.data = lineData
 
-            // 配置图表样式 - 传递settingsManager用于格式化
-            setupChartStyle(lineChart, timeLabels, settingsManager, temperatureEntries, feelsLikeEntries)
+            // 🔧 关键修复：将时间标签传递给自定义图表
+            lineChart.setTimeLabels(timeLabels)
+
+            // 配置图表样式
+            setupLineChartStyle(lineChart, timeLabels, settingsManager)
             
-            // 刷新图表
             lineChart.invalidate()
         }
 
         /**
-         * 配置降水概率柱状图
+         * 设置24小时降水概率柱状图
+         * 🔄 全新实现：使用自定义图表解决标签位置问题
          */
         fun setupPrecipitationChart(
             context: Context,
-            barChart: BarChart,
+            barChart: CustomBarChart,
             hourlyData: List<HourlyWeatherData>
         ) {
             if (hourlyData.isEmpty()) {
@@ -124,85 +109,76 @@ class WeatherChartHelper {
                 return
             }
 
-            // 数据验证和准备
-            val validatedData = validateHourlyData(hourlyData)
+            // 简单数据处理：按时间排序，最多取24个数据点
+            val sortedData = hourlyData
+                .sortedBy { it.timeEpoch }
+                .take(24)
+            
+            // 生成与温度图相同的时间标签
+            val timeLabels = generateSimpleTimeLabels(sortedData)
+            
+            // 创建降水数据点
             val precipitationEntries = mutableListOf<BarEntry>()
-            val timeLabels = generateTimeLabels(validatedData)
             val colorList = mutableListOf<Int>()
 
-            // 根据验证后的数据生成图表点
-            validatedData.forEachIndexed { index, data ->
-                // 使用实际的降水概率数据
+            sortedData.forEachIndexed { index, data ->
                 val precipChance = maxOf(data.chanceOfRain, data.chanceOfSnow)
+                val displayValue = if (precipChance >= MIN_PRECIPITATION_DISPLAY) precipChance.toFloat() else 0f
                 
-                // 只有达到最小阈值的降水概率才显示
-                val displayValue = if (precipChance >= MIN_PRECIPITATION_THRESHOLD) precipChance.toFloat() else 0f
                 precipitationEntries.add(BarEntry(index.toFloat(), displayValue))
                 
-                // 设置颜色 - 只有达到阈值的才显示颜色
-                val color = if (precipChance >= MIN_PRECIPITATION_THRESHOLD) {
-                    when {
-                        precipChance >= 70 -> ContextCompat.getColor(context, R.color.white)
-                        precipChance >= 40 -> ContextCompat.getColor(context, R.color.white_80)
-                        precipChance >= 20 -> ContextCompat.getColor(context, R.color.white_60)
-                        else -> ContextCompat.getColor(context, R.color.white_40)
-                    }
-                } else {
-                    android.graphics.Color.TRANSPARENT
+                // 简单的颜色映射
+                val color = when {
+                    precipChance >= 70 -> ContextCompat.getColor(context, R.color.white)
+                    precipChance >= 40 -> ContextCompat.getColor(context, R.color.white_80)
+                    precipChance >= 20 -> ContextCompat.getColor(context, R.color.white_60)
+                    precipChance >= MIN_PRECIPITATION_DISPLAY -> ContextCompat.getColor(context, R.color.white_40)
+                    else -> Color.TRANSPARENT
                 }
                 colorList.add(color)
             }
 
             // 创建降水数据集
-            val precipitationDataSet = BarDataSet(precipitationEntries, "").apply { // 移除标签避免显示图例
+            val precipitationDataSet = BarDataSet(precipitationEntries, "").apply {
                 colors = colorList
                 setDrawValues(true)
                 valueTextColor = ContextCompat.getColor(context, R.color.white_80)
                 valueTextSize = 9f
                 valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
-                        return if (value >= MIN_PRECIPITATION_THRESHOLD) "${value.toInt()}%" else ""
+                        return if (value >= MIN_PRECIPITATION_DISPLAY) "${value.toInt()}%" else ""
                     }
                 }
             }
 
             // 设置数据
             val barData = BarData(precipitationDataSet)
-            barData.barWidth = BAR_WIDTH
+            barData.barWidth = 0.7f
             barChart.data = barData
+
+            // 🔧 关键修复：将时间标签传递给自定义图表
+            barChart.setTimeLabels(timeLabels)
 
             // 配置图表样式
             setupBarChartStyle(barChart, timeLabels)
             
-            // 刷新图表
             barChart.invalidate()
         }
 
         /**
-         * 验证和处理小时级数据
-         * 确保数据的完整性和正确性
+         * 生成简洁的时间标签
+         * 🔧 关键修复：使用索引间隔而不是小时间隔，确保从起始时间开始每3小时显示
          */
-        private fun validateHourlyData(hourlyData: List<HourlyWeatherData>): List<HourlyWeatherData> {
-            // 按小时排序，确保数据顺序正确
-            val sortedData = hourlyData.sortedBy { it.hour }
+        private fun generateSimpleTimeLabels(hourlyData: List<HourlyWeatherData>): List<String> {
+            val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
             
-            // 如果数据不足或过多，保留前24小时
-            return if (sortedData.size > 24) {
-                sortedData.take(24)
-            } else {
-                sortedData
-            }
-        }
-        
-        /**
-         * 生成时间标签
-         * 优化标签生成逻辑，确保即使数据不完整也能正确显示
-         */
-        private fun generateTimeLabels(hourlyData: List<HourlyWeatherData>): List<String> {
-            return hourlyData.map { data ->
-                // 为重点时间显示完整标签，其他时间显示空字符串
-                if (data.hour in KEY_HOURS) {
-                    String.format("%d:00", data.hour)
+            return hourlyData.mapIndexed { index, data ->
+                // 🔧 关键修复：使用索引间隔，从index 0开始，每3个索引显示一个标签
+                // 这样确保从起始时间开始，真正的每3小时间隔显示（如：20:00, 23:00, 02:00...）
+                val shouldShowLabel = index % LABEL_INTERVAL_HOURS == 0
+                
+                if (shouldShowLabel) {
+                    timeFormatter.format(Date(data.timeEpoch * 1000))
                 } else {
                     ""
                 }
@@ -210,14 +186,13 @@ class WeatherChartHelper {
         }
 
         /**
-         * 配置折线图的通用样式
+         * 配置折线图样式
+         * 🔧 关键修复：禁用原生X轴标签，使用自定义Canvas绘制
          */
-        private fun setupChartStyle(
-            chart: LineChart, 
+        private fun setupLineChartStyle(
+            chart: CustomLineChart, 
             timeLabels: List<String>,
-            settingsManager: SettingsManager,
-            temperatureEntries: List<Entry>,
-            feelsLikeEntries: List<Entry>
+            settingsManager: SettingsManager
         ) {
             chart.apply {
                 // 基本设置
@@ -227,65 +202,42 @@ class WeatherChartHelper {
                 setScaleEnabled(false)
                 setPinchZoom(false)
                 setDrawGridBackground(false)
-                
-                // 🔧 新增：启用高亮功能
                 isHighlightPerTapEnabled = true
                 isHighlightPerDragEnabled = false
                 
-                // 🔧 新增：设置标记视图（可选）
-                // marker = CustomMarkerView(context, R.layout.marker_view)
-                
-                // 图例设置
-                legend.apply {
-                    isEnabled = true
-                    textColor = Color.parseColor("#CCFFFFFF")
-                    textSize = 10f
-                    form = com.github.mikephil.charting.components.Legend.LegendForm.CIRCLE
-                    formSize = 8f
-                    verticalAlignment = com.github.mikephil.charting.components.Legend.LegendVerticalAlignment.BOTTOM
-                    horizontalAlignment = com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER
-                    orientation = com.github.mikephil.charting.components.Legend.LegendOrientation.HORIZONTAL
-                    setDrawInside(false)
-                    xEntrySpace = 16f
-                    yEntrySpace = 0f
-                    formToTextSpace = 8f
-                    yOffset = 10f
-                }
+                // 禁用图例
+                legend.isEnabled = false
 
-                // X轴设置
+                // X轴设置 - 🔧 关键修复：完全禁用原生标签，使用Canvas手动绘制
                 xAxis.apply {
                     position = XAxis.XAxisPosition.BOTTOM
                     setDrawGridLines(true)
                     gridColor = Color.parseColor("#33FFFFFF")
-                    textColor = Color.parseColor("#CCFFFFFF")
-                    textSize = 10f
-                    granularity = 1f
-                    labelCount = if (timeLabels.isNotEmpty()) timeLabels.size else 8
-                    axisMinimum = 0f
-                    axisMaximum = if (timeLabels.isNotEmpty()) (timeLabels.size - 1).toFloat() else 23f
-                    valueFormatter = IndexAxisValueFormatter(timeLabels)
-                    // 确保标签正确显示
-                    setAvoidFirstLastClipping(false)
-                    setLabelRotationAngle(0f)
-                    setCenterAxisLabels(false)
+                    
+                    // 🔧 核心修复：禁用所有原生X轴标签显示
+                    setDrawLabels(false)  // 完全禁用X轴标签
+                    setDrawAxisLine(false) // 禁用X轴线
+                    
+                    setAxisMinimum(0f)
+                    setAxisMaximum((timeLabels.size - 1).toFloat())
                 }
 
-                // 左Y轴设置 - 根据温度单位设置格式化
+                // Y轴设置 - 固定范围，简单可靠
                 axisLeft.apply {
                     setDrawGridLines(true)
                     gridColor = Color.parseColor("#33FFFFFF")
                     textColor = Color.parseColor("#CCFFFFFF")
                     textSize = 10f
-                    granularity = TEMPERATURE_GRANULARITY
                     
-                    // 🔧 优化：自适应Y轴范围
-                    if (temperatureEntries.isNotEmpty() || feelsLikeEntries.isNotEmpty()) {
-                        val allTemps = temperatureEntries.map { it.y } + feelsLikeEntries.map { it.y }
-                        val minTemp = allTemps.minOrNull() ?: 0f
-                        val maxTemp = allTemps.maxOrNull() ?: 30f
-                        val padding = (maxTemp - minTemp) * 0.1f // 10%的边距
-                        axisMinimum = (minTemp - padding).coerceAtLeast(minTemp - 5f)
-                        axisMaximum = maxTemp + padding
+                    // 简单的固定范围策略
+                    if (settingsManager.isCelsius()) {
+                        setAxisMinimum(0f)
+                        setAxisMaximum(50f)
+                        granularity = 5f
+                    } else {
+                        setAxisMinimum(32f)
+                        setAxisMaximum(122f)
+                        granularity = 10f
                     }
                     
                     valueFormatter = object : ValueFormatter() {
@@ -295,23 +247,20 @@ class WeatherChartHelper {
                     }
                 }
 
-                // 右Y轴禁用
+                // 禁用右Y轴
                 axisRight.isEnabled = false
-
-                // 设置视口，优化性能
-                setVisibleXRangeMaximum(VISIBLE_X_RANGE_MAX)
-                moveViewToX(0f)
                 
-                // 禁用动画，减少闪烁
-                animateX(0)
-                animateY(0)
+                // 设置可见范围
+                setVisibleXRangeMaximum(12f)
+                moveViewToX(0f)
             }
         }
 
         /**
-         * 配置柱状图的通用样式
+         * 配置柱状图样式
+         * 🔧 关键修复：禁用原生X轴标签，与折线图保持一致
          */
-        private fun setupBarChartStyle(chart: BarChart, timeLabels: List<String>) {
+        private fun setupBarChartStyle(chart: CustomBarChart, timeLabels: List<String>) {
             chart.apply {
                 // 基本设置
                 description.isEnabled = false
@@ -320,44 +269,35 @@ class WeatherChartHelper {
                 setScaleEnabled(false)
                 setPinchZoom(false)
                 setDrawGridBackground(false)
-                
-                // 🔧 新增：启用高亮功能
                 isHighlightPerTapEnabled = true
                 isHighlightPerDragEnabled = false
                 
-                // 🔧 新增：设置标记视图（可选）
-                // marker = CustomMarkerView(context, R.layout.marker_view)
-                
-                // 禁用图例，避免显示"降水概率"文字
+                // 禁用图例
                 legend.isEnabled = false
 
-                // X轴设置
+                // X轴设置 - 🔧 关键修复：与折线图完全一致，禁用原生标签
                 xAxis.apply {
                     position = XAxis.XAxisPosition.BOTTOM
                     setDrawGridLines(false)
-                    textColor = Color.parseColor("#CCFFFFFF")
-                    textSize = 10f
-                    granularity = 1f
-                    labelCount = if (timeLabels.isNotEmpty()) timeLabels.size else 8
-                    axisMinimum = 0f
-                    axisMaximum = if (timeLabels.isNotEmpty()) (timeLabels.size - 1).toFloat() else 23f
-                    valueFormatter = IndexAxisValueFormatter(timeLabels)
-                    // 确保标签正确显示
-                    setAvoidFirstLastClipping(false)
-                    setLabelRotationAngle(0f)
-                    setCenterAxisLabels(false)
+                    
+                    // 🔧 核心修复：禁用所有原生X轴标签显示
+                    setDrawLabels(false)  // 完全禁用X轴标签
+                    setDrawAxisLine(false) // 禁用X轴线
+                    
+                    setAxisMinimum(0f)
+                    setAxisMaximum((timeLabels.size - 1).toFloat())
                 }
 
-                // 左Y轴设置
+                // Y轴设置 - 简单的0-100%固定范围
                 axisLeft.apply {
                     setDrawGridLines(true)
                     gridColor = Color.parseColor("#33FFFFFF")
                     textColor = Color.parseColor("#CCFFFFFF")
                     textSize = 10f
-                    axisMinimum = 0f
-                    axisMaximum = 100f
-                    granularity = PRECIPITATION_GRANULARITY
-                    labelCount = 6 // 显示0%, 20%, 40%, 60%, 80%, 100%
+                    setAxisMinimum(0f)
+                    setAxisMaximum(100f)
+                    granularity = 20f
+                    labelCount = 6
                     valueFormatter = object : ValueFormatter() {
                         override fun getFormattedValue(value: Float): String {
                             return "${value.toInt()}%"
@@ -365,16 +305,12 @@ class WeatherChartHelper {
                     }
                 }
 
-                // 右Y轴禁用
+                // 禁用右Y轴
                 axisRight.isEnabled = false
-
-                // 设置视口，优化性能
-                setVisibleXRangeMaximum(VISIBLE_X_RANGE_MAX)
-                moveViewToX(0f)
                 
-                // 禁用动画，减少闪烁
-                animateX(0)
-                animateY(0)
+                // 设置可见范围 - 与折线图一致
+                setVisibleXRangeMaximum(12f)
+                moveViewToX(0f)
             }
         }
     }

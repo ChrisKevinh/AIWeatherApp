@@ -349,7 +349,7 @@
                                 android:textSize="13sp"
                                 android:layout_marginBottom="8dp" />
 
-                            <com.github.mikephil.charting.charts.LineChart
+                            <com.example.weatherdemo.ui.CustomLineChart
                                 android:id="@+id/temperatureChart"
                                 android:layout_width="match_parent"
                                 android:layout_height="200dp"
@@ -378,7 +378,7 @@
                                 android:textSize="13sp"
                                 android:layout_marginBottom="8dp" />
 
-                            <com.github.mikephil.charting.charts.BarChart
+                            <com.example.weatherdemo.ui.CustomBarChart
                                 android:id="@+id/precipitationChart"
                                 android:layout_width="match_parent"
                                 android:layout_height="180dp"

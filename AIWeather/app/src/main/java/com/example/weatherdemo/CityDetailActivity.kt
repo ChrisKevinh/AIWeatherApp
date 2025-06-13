@@ -22,6 +22,8 @@ import com.example.weatherdemo.viewmodel.WeatherViewModel
 import com.example.weatherdemo.viewmodel.WeatherViewModelFactory
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
+import com.example.weatherdemo.ui.CustomLineChart
+import com.example.weatherdemo.ui.CustomBarChart
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,8 +35,8 @@ class CityDetailActivity : AppCompatActivity() {
     private lateinit var hourlyWeatherAdapter: HourlyWeatherAdapter
     
     // 图表组件
-    private lateinit var temperatureChart: LineChart
-    private lateinit var precipitationChart: BarChart
+    private lateinit var temperatureChart: CustomLineChart
+    private lateinit var precipitationChart: CustomBarChart
     
     // 加载状态相关
     private var loadingView: View? = null
@@ -232,16 +234,24 @@ class CityDetailActivity : AppCompatActivity() {
             Log.d("HourlyWeather", "观察到小时数据变化：${hourlyDataList?.size ?: 0}条")
             
             if (hourlyDataList != null && hourlyDataList.isNotEmpty()) {
-                WeatherChartHelper.setupTemperatureChart(this, temperatureChart, hourlyDataList)
-                WeatherChartHelper.setupPrecipitationChart(this, precipitationChart, hourlyDataList)
+                // 🔧 关键修复：图表也使用从当前时间开始的24小时数据
+                val next24Hours = getNext24Hours(hourlyDataList)
+                Log.d("HourlyWeather", "图表使用筛选后数据：${next24Hours.size}条")
                 
-                // 更新24小时天气预报
-                updateHourlyWeatherForecast(hourlyDataList)
+                WeatherChartHelper.setupTemperatureChart(this, temperatureChart, next24Hours)
+                WeatherChartHelper.setupPrecipitationChart(this, precipitationChart, next24Hours)
+                
+                // 更新24小时天气预报（复用相同的数据）
+                hourlyWeatherAdapter.updateHourlyData(next24Hours)
             } else {
                 // 如果没有数据，生成一些测试数据用于调试
                 Log.d("HourlyWeather", "小时数据为空，生成测试数据")
                 val testData = generateTestHourlyData()
-                updateHourlyWeatherForecast(testData)
+                val next24Hours = getNext24Hours(testData)
+                
+                WeatherChartHelper.setupTemperatureChart(this, temperatureChart, next24Hours)
+                WeatherChartHelper.setupPrecipitationChart(this, precipitationChart, next24Hours)
+                hourlyWeatherAdapter.updateHourlyData(next24Hours)
             }
         }
         
@@ -249,7 +259,13 @@ class CityDetailActivity : AppCompatActivity() {
         viewModel.hourlyWeatherData.value?.let { existingData ->
             Log.d("HourlyWeather", "发现已存在的小时数据：${existingData.size}条")
             if (existingData.isNotEmpty()) {
-                updateHourlyWeatherForecast(existingData)
+                // 🔧 关键修复：使用从当前时间开始的24小时数据
+                val next24Hours = getNext24Hours(existingData)
+                hourlyWeatherAdapter.updateHourlyData(next24Hours)
+                
+                // 同时更新图表
+                WeatherChartHelper.setupTemperatureChart(this, temperatureChart, next24Hours)
+                WeatherChartHelper.setupPrecipitationChart(this, precipitationChart, next24Hours)
             }
         }
     }
@@ -357,21 +373,11 @@ class CityDetailActivity : AppCompatActivity() {
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
     }
     
-    /**
-     * 更新24小时天气预报
-     */
-    private fun updateHourlyWeatherForecast(hourlyDataList: List<HourlyWeatherData>) {
-        Log.d("HourlyWeather", "收到小时数据：${hourlyDataList.size}条")
-        
-        // 获取接下来24小时的数据
-        val next24Hours = getNext24Hours(hourlyDataList)
-        Log.d("HourlyWeather", "筛选后数据：${next24Hours.size}条")
-        
-        hourlyWeatherAdapter.updateHourlyData(next24Hours)
-    }
+    // 🔧 已删除重复的updateHourlyWeatherForecast方法，现在直接在观察者中处理
     
     /**
      * 从小时数据中获取接下来24小时的数据
+     * 🔧 修复：使用timeEpoch进行精确的时间匹配，支持跨天数据
      */
     private fun getNext24Hours(hourlyDataList: List<HourlyWeatherData>): List<HourlyWeatherData> {
         if (hourlyDataList.isEmpty()) {
@@ -379,31 +385,41 @@ class CityDetailActivity : AppCompatActivity() {
             return emptyList()
         }
         
-        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val currentTimeMillis = System.currentTimeMillis()
-        Log.d("HourlyWeather", "当前时间：${currentHour}时，时间戳：$currentTimeMillis")
+        val currentTimeSeconds = currentTimeMillis / 1000
+        Log.d("HourlyWeather", "当前时间戳：$currentTimeMillis ($currentTimeSeconds)")
         
         // 按时间戳排序，确保数据按时间顺序排列
         val sortedList = hourlyDataList.sortedBy { it.timeEpoch }
         
-        // 找到当前小时或最接近当前小时的数据点
-        var startIndex = sortedList.indexOfFirst { it.hour == currentHour }
+        // 🔧 修复：基于timeEpoch找到最接近当前时间且不早于当前时间的数据点
+        var startIndex = -1
+        var minFutureDiff = Long.MAX_VALUE
         
+        sortedList.forEachIndexed { index, data ->
+            val timeDiff = data.timeEpoch - currentTimeSeconds
+            // 寻找最接近当前时间的未来时间点（允许1小时的容差）
+            if (timeDiff >= -3600 && timeDiff < minFutureDiff) {
+                minFutureDiff = timeDiff
+                startIndex = index
+            }
+        }
+        
+        // 如果没找到合适的起始点，使用最接近当前时间的数据点
         if (startIndex == -1) {
-            // 如果找不到当前小时的数据，找最接近当前时间的数据
             var closestIndex = 0
-            var minDiff = Math.abs(sortedList[0].timeEpoch * 1000 - currentTimeMillis)
+            var minDiff = Math.abs(sortedList[0].timeEpoch - currentTimeSeconds)
             sortedList.forEachIndexed { index, data ->
-                val diff = Math.abs(data.timeEpoch * 1000 - currentTimeMillis)
+                val diff = Math.abs(data.timeEpoch - currentTimeSeconds)
                 if (diff < minDiff) {
                     minDiff = diff
                     closestIndex = index
                 }
             }
-            Log.d("HourlyWeather", "未找到当前小时(${currentHour})的数据，使用最接近的数据点，索引：$closestIndex")
             startIndex = closestIndex
+            Log.d("HourlyWeather", "使用最接近当前时间的数据点，索引：$startIndex")
         } else {
-            Log.d("HourlyWeather", "找到当前小时(${currentHour})的数据点，索引：$startIndex")
+            Log.d("HourlyWeather", "找到合适的起始数据点，索引：$startIndex，时间差：${minFutureDiff}秒")
         }
         
         // 从找到的位置开始取24小时的数据
@@ -416,10 +432,10 @@ class CityDetailActivity : AppCompatActivity() {
         }
         
         Log.d("HourlyWeather", "最终返回数据：${result.size}条")
-        result.forEach { 
+        result.forEachIndexed { index, data -> 
             val timeStr = java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault())
-                .format(java.util.Date(it.timeEpoch * 1000))
-            Log.d("HourlyWeather", "时间：$timeStr (${it.hour}时)，温度：${it.temperature}°，降雨：${it.chanceOfRain}%")
+                .format(java.util.Date(data.timeEpoch * 1000))
+            Log.d("HourlyWeather", "[$index] 时间：$timeStr，温度：${data.temperature}°，降雨：${data.chanceOfRain}%")
         }
         
         return result
@@ -446,8 +462,10 @@ class CityDetailActivity : AppCompatActivity() {
         // 4. 重新绘制图表
         viewModel.hourlyWeatherData.value?.let { hourlyDataList ->
             if (hourlyDataList.isNotEmpty()) {
-                WeatherChartHelper.setupTemperatureChart(this, temperatureChart, hourlyDataList)
-                WeatherChartHelper.setupPrecipitationChart(this, precipitationChart, hourlyDataList)
+                // 🔧 关键修复：图表刷新时也使用从当前时间开始的24小时数据
+                val next24Hours = getNext24Hours(hourlyDataList)
+                WeatherChartHelper.setupTemperatureChart(this, temperatureChart, next24Hours)
+                WeatherChartHelper.setupPrecipitationChart(this, precipitationChart, next24Hours)
             }
         }
     }
